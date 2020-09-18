@@ -15,6 +15,8 @@
 
 #include <Eigen/Core>
 
+#include <vector>
+
 
 class AprilTagNode : public rclcpp::Node {
 public:
@@ -32,6 +34,7 @@ private:
     const int max_hamming;
     std::unordered_map<int, std::string> tag_frames;
     std::unordered_map<int, double> tag_sizes;
+    std::vector<int> tag_ids;
 
     Mat3 K;
 

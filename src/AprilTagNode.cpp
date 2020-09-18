@@ -1,6 +1,7 @@
 #include <AprilTagNode.hpp>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
+#include <opencv2/highgui.hpp>
 
 // default tag families
 #include <apriltag/tag16h5.h>
@@ -98,9 +99,24 @@ AprilTagNode::~AprilTagNode() {
 void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_img, const sensor_msgs::msg::CameraInfo::ConstSharedPtr& msg_ci) {
     // copy camera intrinsics
     std::memcpy(K.data(), msg_ci->k.data(), 9*sizeof(double));
+    
+    if(K.sum() <= 1e-20)
+    {
+    	K.setZero();
+    	
+
+	K(0,0) = 960.0;
+	K(0,2) = 960.0;
+	K(1,1) = 960.0;
+	K(1,2) = 540.0;
+	K(2,2) = 1.0;
+    }
 
     // convert to 8bit monochrome image
     const cv::Mat img_uint8 = cv_bridge::toCvShare(msg_img, "mono8")->image;
+
+    //cv::imshow("AprilTags", img_uint8);
+    //cv::waitKey(0);
 
     image_u8_t im = {
         .width = img_uint8.cols,
@@ -126,6 +142,8 @@ void AprilTagNode::onCamera(const sensor_msgs::msg::Image::ConstSharedPtr& msg_i
 
         // reject detections with more corrected bits than allowed
         if(det->hamming>max_hamming) { continue; }
+
+	std::cout << "Accepted detection with hamming = " << det->hamming << std::endl;
 
         // detection
         apriltag_msgs::msg::AprilTagDetection msg_detection;
@@ -177,6 +195,8 @@ void AprilTagNode::getPose(const matd_t& H, geometry_msgs::msg::Transform& t, co
     // the corner coordinates of the tag in the canonical frame are (+/-1, +/-1)
     // hence the scale is half of the edge size
     const Eigen::Vector3d tt = T.rightCols<1>() / ((T.col(0).norm() + T.col(0).norm())/2.0) * (size/2.0);
+
+    //std::cout << "T = " << T << std::endl;
 
     const Eigen::Quaterniond q(R);
 
