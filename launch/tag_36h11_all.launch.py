@@ -2,15 +2,15 @@ import launch
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
 
-# detect all 16h5 tags
+# detect all 36h11 tags
 cfg_16h5 = {
     "image_transport": "raw",
-    "family": "16h5",
-    "size": 0.151,
+    "family": "36h11",
+    "size": 0.1559,
     "max_hamming": 0,
     "z_up": True,
-    "tag_ids": [1,2,3,4,5,6,7],
-    "tag_frames": ["tag_1","tag_2","tag_3","tag_4","tag_5","tag_6","tag_7"],
+    "tag_ids": [0,1,2,3,4,5,6,7],
+    "tag_frames": ["tag_0","tag_1","tag_2","tag_3","tag_4","tag_5","tag_6","tag_7"],
 }
 
 def generate_launch_description():
